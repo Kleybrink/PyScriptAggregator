@@ -1,7 +1,7 @@
 # PyScriptAggregator: Python Codebase Consolidator
 
 **What is PyScriptAggregator?**  
-PyScriptAggregator is a Python tool designed to consolidate Python code from various files within a directory and its subdirectories. A primary use case is efficiently consolidating codebases for language models like ChatGPT.
+PyScriptAggregator is a Python tool designed to consolidate Python code from various files within a directory and its subdirectories. Whether you're looking to batch together multiple scripts or get a summary of definitions across a project, this tool can help. A primary use case is efficiently consolidating codebases for language models like ChatGPT.
 
 ## Installation
 
@@ -26,12 +26,14 @@ sagg --output=OUTPUT_FILENAME.txt
 ```
 
 **Options:**  
-- `--remove-comments`: Removes comments from the Python files.
-- `--output`: Specifies the name of the output file (default is `combined_code.txt`).
-- `--depth`: Sets the maximum directory depth to search (default is 1, meaning only the next directory level).
+- `--remove-comments`: Removes comments and docstrings from the Python files.
+- `--output` or `-o`: Specifies the name of the output file (default is `combined_code.txt`).
+- `--depth` or `-d`: Sets the maximum directory depth to search (default is 1, meaning only the next directory level).
+- `--show-defs` or `-s`: Instead of showing the full content, only show definitions (functions, classes, variables) in the output.
+- `--no-filter-for` or `-e`: Specify a filename for which you want to show the full content, excluding it from other filters. For example, `-e special_script.py` will show the complete content of `special_script.py`.
 
-**Example:** To consolidate all Python files in the current directory and its immediate subdirectories, excluding comments:
+**Example:** To consolidate all Python files in the current directory and its immediate subdirectories, excluding comments, and only showing definitions:
 
 ```bash
-sagg --remove-comments --depth=1 --output=consolidated_code.txt
+sagg --remove-comments --depth=1 --show-defs --output=consolidated_summary.txt
 ```

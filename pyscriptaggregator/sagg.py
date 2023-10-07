@@ -15,13 +15,13 @@ def setup_logging():
     )
 
 
-def remove_comments(source):
+def remove_comments(source_code):
     """Remove comments and docstrings from Python source code."""
     result = StringIO()
     last_lineno = -1
     last_col = 0
 
-    for tok in tokenize.generate_tokens(source.readline):
+    for tok in tokenize.generate_tokens(source_code.readline):
         token_type = tok[0]
         token_string = tok[1]
         start_line, start_col = tok[2]
