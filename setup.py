@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="ScriptAggregator",
+    name="PyScriptAggregator",
     version="0.1",
     packages=find_packages(),
     install_requires=[
@@ -9,7 +9,7 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'sagg=scriptaggregator.sagg:main',
+            'sagg=pyscriptaggregator.sagg:main',
         ],
     },
 )

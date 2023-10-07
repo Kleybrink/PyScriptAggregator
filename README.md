@@ -1,7 +1,7 @@
-# ScriptAggregator: Python Codebase Consolidator
+# PyScriptAggregator: Python Codebase Consolidator
 
-**What is ScriptAggregator?**  
-ScriptAggregator is a Python tool designed to consolidate Python code from various files within a directory and its subdirectories. A primary use case is efficiently consolidating codebases for language models like ChatGPT.
+**What is PyScriptAggregator?**  
+PyScriptAggregator is a Python tool designed to consolidate Python code from various files within a directory and its subdirectories. A primary use case is efficiently consolidating codebases for language models like ChatGPT.
 
 ## Installation
 
@@ -10,8 +10,8 @@ ScriptAggregator is a Python tool designed to consolidate Python code from vario
 To get the latest version directly from the repository:
 
 ```bash
-git clone https://github.com/Kleybrink/ScriptAggregator.git
-cd ScriptAggregator
+git clone https://github.com/Kleybrink/PyScriptAggregator.git
+cd PyScriptAggregator
 pip install .
 ```
 
