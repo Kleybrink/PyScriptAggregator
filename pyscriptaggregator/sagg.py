@@ -16,7 +16,6 @@ def setup_logging():
 def remove_comments(source):
     """Remove comments and docstrings from Python source code."""
     result = StringIO()
-    prev_toktype = tokenize.INDENT
     last_lineno = -1
     last_col = 0
 
@@ -42,7 +41,6 @@ def remove_comments(source):
             result.write(" " * (start_col - last_col))
 
         result.write(token_string)
-        prev_toktype = token_type
         last_col = end_col
         last_lineno = end_line
 
