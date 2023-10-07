@@ -3,11 +3,15 @@ import argparse
 import logging
 from io import StringIO
 import tokenize
-from tiktoken import Tokenizer
+import tiktoken
+
 
 def setup_logging():
     """Setup basic logging configuration."""
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    )
+
 
 def remove_comments(source):
     """Remove comments and docstrings from Python source code."""
@@ -15,8 +19,6 @@ def remove_comments(source):
     prev_toktype = tokenize.INDENT
     last_lineno = -1
     last_col = 0
-    inside_multiline_string = False
-    current_string_delimiter = None
 
     for tok in tokenize.generate_tokens(source.readline):
         token_type = tok[0]
@@ -24,47 +26,60 @@ def remove_comments(source):
         start_line, start_col = tok[2]
         end_line, end_col = tok[3]
 
-        if token_string in ['"""', "'''"] and not inside_multiline_string:
-            inside_multiline_string = True
-            current_string_delimiter = token_string
-        elif token_string == current_string_delimiter and inside_multiline_string:
-            inside_multiline_string = False
-            current_string_delimiter = None
+        # For multiline docstrings/comments
+        if token_type == tokenize.STRING and (
+            token_string.startswith('"""') or token_string.startswith("'''")
+        ):
             continue
 
-        if inside_multiline_string:
+        # If it's a single line comment
+        if token_type == tokenize.COMMENT:
             continue
 
         if start_line > last_lineno:
             last_col = 0
         if start_col > last_col:
             result.write(" " * (start_col - last_col))
-        if token_type == tokenize.COMMENT:
-            pass
-        else:
-            result.write(token_string)
+
+        result.write(token_string)
         prev_toktype = token_type
         last_col = end_col
         last_lineno = end_line
 
     return result.getvalue()
 
+
 def main():
-    parser = argparse.ArgumentParser(description='Combine .py files from current directory and subdirectories.')
-    parser.add_argument('--remove-comments', action='store_true', help='Remove comments from the .py files.')
-    parser.add_argument('--output', default="combined_code.txt", help='Specify the filename for the output file.')
-    parser.add_argument('--depth', type=int, default=1, help='Maximum directory depth to search. Default is 1, which means only the next level of folders.')
-    
+    parser = argparse.ArgumentParser(
+        description="Combine .py files from current directory and subdirectories."
+    )
+    parser.add_argument(
+        "--remove-comments",
+        action="store_true",
+        help="Remove comments from the .py files.",
+    )
+    parser.add_argument(
+        "--output",
+        default="combined_code.txt",
+        help="Specify the filename for the output file.",
+    )
+    parser.add_argument(
+        "--depth",
+        type=int,
+        default=1,
+        help="Maximum directory depth to search. Default is 1, which means only the next level of folders.",
+    )
+
     args = parser.parse_args()
 
     if os.path.exists(args.output):
-        logging.error(f"Output file {args.output} already exists. Aborting to prevent overwrite.")
-        return
+        logging.warning(
+            f"Output file {args.output} already exists. It will be overwritten."
+        )
 
     current_directory = os.getcwd()
     start_depth = current_directory.count(os.path.sep)
     included_files = []
-    tokenizer = Tokenizer()
 
     with open(args.output, "w") as output_file:
         for dirpath, dirnames, filenames in os.walk(current_directory):
@@ -74,10 +89,17 @@ def main():
                 continue
 
             for filename in filenames:
-                if filename.endswith('.py'):
-                    filepath = os.path.join(dirpath, filename)
+                if filename.endswith(".py"):
+                    relative_path = os.path.relpath(dirpath, current_directory)
+                    filepath = (
+                        os.path.join(relative_path, filename)
+                        if relative_path != "."
+                        else filename
+                    )
                     try:
-                        with open(filepath, 'r', encoding='utf-8') as file:
+                        with open(
+                            os.path.join(dirpath, filename), "r", encoding="utf-8"
+                        ) as file:
                             content = file.read()
                             if args.remove_comments:
                                 content = remove_comments(StringIO(content))
@@ -87,8 +109,10 @@ def main():
                     except Exception as e:
                         logging.error(f"Failed to process {filepath}. Error: {e}")
 
+    enc = tiktoken.encoding_for_model("gpt-4")
     with open(args.output, "r", encoding="utf-8") as f:
-        token_count = tokenizer.count_tokens(f.read())
+        content = f.read()
+        token_count = len(enc.encode(content))
 
     print("Summary:")
     print(f"Included Files: {len(included_files)}")
@@ -96,6 +120,7 @@ def main():
         print(f"  - {file}")
     print(f"Written to: {args.output}")
     print(f"Total Tokens in {args.output}: {token_count}")
+
 
 if __name__ == "__main__":
     setup_logging()
