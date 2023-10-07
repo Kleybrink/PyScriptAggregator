@@ -1,2 +1,31 @@
-# ScriptAggregator
-ScriptAggregator: A versatile tool for seamlessly combining Python scripts from a directory hierarchy, with options to exclude comments and customize output depth and naming.
+# ScriptAggregator: Python Codebase Consolidator
+
+**What is ScriptAggregator?**  
+ScriptAggregator is a Python tool designed to consolidate Python code from various files within a directory and its subdirectories. A primary use case is efficiently consolidating codebases for language models like ChatGPT.
+
+## Installation
+
+```bash
+git clone https://github.com/Kleybrink/ScriptAggregator.git
+cd ScriptAggregator
+pip install -r requirements.txt
+```
+
+## Usage
+
+Use `sagg` from the command line to run the tool:
+
+```bash
+sagg --output=OUTPUT_FILENAME.txt
+```
+
+**Options:**  
+- `--remove-comments`: Removes comments from the Python files.
+- `--output`: Specifies the name of the output file (default is `combined_code.txt`).
+- `--depth`: Sets the maximum directory depth to search (default is 1, meaning only the next directory level).
+
+**Example:** To consolidate all Python files in the current directory and its next subdirectory level without comments:
+
+```bash
+sagg --remove-comments --depth=1 --output=consolidated_code.txt
+```
