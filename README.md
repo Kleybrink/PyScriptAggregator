@@ -5,15 +5,21 @@ ScriptAggregator is a Python tool designed to consolidate Python code from vario
 
 ## Installation
 
+### From GitHub
+
+To get the latest version directly from the repository:
+
 ```bash
 git clone https://github.com/Kleybrink/ScriptAggregator.git
 cd ScriptAggregator
-pip install -r requirements.txt
+pip install .
 ```
+
+**Note**: Instead of installing the requirements via `requirements.txt`, we're suggesting the use of `pip install .`, as this method will also make the `sagg` script globally available in your environment.
 
 ## Usage
 
-Use `sagg` from the command line to run the tool:
+Once installed, you can use `sagg` from any directory in your command line:
 
 ```bash
 sagg --output=OUTPUT_FILENAME.txt
@@ -24,7 +30,7 @@ sagg --output=OUTPUT_FILENAME.txt
 - `--output`: Specifies the name of the output file (default is `combined_code.txt`).
 - `--depth`: Sets the maximum directory depth to search (default is 1, meaning only the next directory level).
 
-**Example:** To consolidate all Python files in the current directory and its next subdirectory level without comments:
+**Example:** To consolidate all Python files in the current directory and its immediate subdirectories, excluding comments:
 
 ```bash
 sagg --remove-comments --depth=1 --output=consolidated_code.txt
