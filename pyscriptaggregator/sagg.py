@@ -1,3 +1,7 @@
+"""
+This is a script that performs aggregation of Python scripts.
+"""
+
 import argparse
 import ast
 import logging
@@ -50,6 +54,7 @@ def remove_comments(source_code):
 
 
 def extract_definitions(source_code):
+    """Extract definitions from Python source code."""
     try:
         root = ast.parse(source_code)
     except SyntaxError as e:
@@ -59,7 +64,7 @@ def extract_definitions(source_code):
     functions = []
     variables = []
 
-    for node in root.body:  # nur direkte Kinder des AST-Roots
+    for node in root.body:
         try:
             if isinstance(node, ast.FunctionDef) and not node.name.startswith("_"):
                 func_name = node.name
@@ -80,7 +85,7 @@ def extract_definitions(source_code):
                 for target in node.targets:
                     if isinstance(target, ast.Name) and not target.id.startswith("_"):
                         variables.append(target.id)
-        except Exception as e:
+        except (SyntaxError, AttributeError) as e:
             return f"Error processing node {node}: {e}"
 
     output = []
@@ -104,6 +109,7 @@ def extract_definitions(source_code):
 
 
 def main():
+    """This is the main function of the script."""
     parser = argparse.ArgumentParser(
         description="Combine .py files from current directory and subdirectories."
     )
@@ -125,7 +131,8 @@ def main():
         "--search-depth",
         type=int,
         default=1,
-        help="Maximum directory depth to search. Default is 1, which means only the next level of folders.",
+        help="Maximum directory depth to search. Default is 1, which means only the "
+        "next level of folders.",
     )
     parser.add_argument(
         "-s",
@@ -137,21 +144,22 @@ def main():
         "-e",
         "--no-filter-for",
         default=None,
-        help="Specify the filename for which you want to show the full content, excluding it from other filters.",
+        help="Specify the filename for which you want to show the full content, "
+        "excluding it from other filters.",
     )
 
     args = parser.parse_args()
 
     if os.path.exists(args.output_file):
         logging.warning(
-            f"Output file {args.output_file} already exists. It will be overwritten."
+            "Output file %s already exists. It will be overwritten.", args.output_file
         )
 
     current_directory = os.getcwd()
     start_depth = current_directory.count(os.path.sep)
     included_files = []
 
-    with open(args.output_file, "w") as output_file:
+    with open(args.output_file, "w", encoding="utf-8") as output_file:
         for dirpath, dirnames, filenames in os.walk(current_directory):
             current_depth = dirpath.count(os.path.sep) - start_depth
             if current_depth > args.search_depth:
@@ -181,8 +189,8 @@ def main():
                             output_file.write(f"===== {filepath} =====\n")
                             output_file.write(content + "\n\n")
                             included_files.append(filepath)
-                    except Exception as e:
-                        logging.error(f"Failed to process {filepath}. Error: {e}")
+                    except (FileNotFoundError, PermissionError) as e:
+                        logging.error("Failed to process %s. Error: %s", filepath, e)
 
     enc = tiktoken.encoding_for_model("gpt-4")
     with open(args.output_file, "r", encoding="utf-8") as f:
